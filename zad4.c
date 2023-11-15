@@ -17,7 +17,64 @@ void insert_s(Polinom **head, int *koeficjent, int *eksponent){
     newpolinom->next = *head;
     *head = newpolinom;
 }
-
+void sort(Polinom *poli){
+    int min=0,mink=0;
+    for(int i=0;i<MAX_TERMS;i++){
+        for(int j=i+1;j<MAX_TERMS;j++){
+            if(poli->eksponent[i]<poli->eksponent[j]){
+                min=poli->eksponent[i];
+                mink=poli->koeficjent[i];
+                poli->eksponent[i]=poli->eksponent[j];
+                poli->koeficjent[i]=poli->koeficjent[j];
+                poli->eksponent[j]=min;
+                poli->koeficjent[j]=mink;
+            }
+        }
+    }
+    
+}
+void zbrajanje(Polinom **head){
+    Polinom *curr=*head;
+    for(Polinom *curr1=curr->next;curr1!=NULL;curr1=curr1->next) {
+        for(int i = 0; i < MAX_TERMS; i++){
+            for(int j=0;j< MAX_TERMS; j++){
+                if(curr->eksponent[i]==curr1->eksponent[j]){
+                    curr->koeficjent[i]=curr->koeficjent[i]+curr1->koeficjent[j];
+                }
+            }
+        }
+    }
+    for(int i=0;i<MAX_TERMS;i++){
+        if(curr->koeficjent[i] != 0 || curr->eksponent[i] != 0) {
+            printf("%d %d\n",curr->koeficjent[i],curr->eksponent[i]);
+        }
+    }
+    
+}
+void mnozenje(Polinom **head){
+    Polinom *curr=*head;
+    int koef[MAX_TERMS] = {0};
+    int eks[MAX_TERMS] = {0};
+    int t=0;
+    for(Polinom *curr1=curr->next;curr1!=NULL;curr1=curr1->next) {
+        for(int i = 0; i < MAX_TERMS; i++){
+            for(int j=0;j< MAX_TERMS; j++){
+                if(curr->koeficjent[i] != 0 && curr1->koeficjent[j] != 0 && curr->eksponent[j] != 0 && curr1->eksponent[j] != 0){
+                    koef[t]=curr->koeficjent[i]*curr1->koeficjent[j];
+                    eks[t]=curr->eksponent[i]+curr1->eksponent[j];
+                    t++;
+                }
+            }
+        }
+    }
+    insert_s(head,koef,eks);
+    curr = *head;
+    for(int i=0;i<MAX_TERMS;i++){
+        if(curr->koeficjent[i] != 0 || curr->eksponent[i] != 0) {
+            printf("%d %d\n",curr->koeficjent[i],curr->eksponent[i]);
+        }
+    }
+}
 int main(){
     Polinom *head=NULL; 
     char c[100];
@@ -40,36 +97,18 @@ int main(){
         while (*ptr != '\n' && *ptr != '\0') {
             if (sscanf(ptr, "%dx^%d", &koeficjent[i], &eksponent[i]) == 2) {
                 i++;
-                while (*ptr != '-' && *ptr != '+' && *ptr != '\n' && *ptr != '\0') {
-                    ptr++;
-                }
-            } else if (sscanf(ptr, "%dx", &koeficjent[i]) == 1) {
-                eksponent[i] = 1;
-                i++;
-                while (*ptr != '-' && *ptr != '+' && *ptr != '\n' && *ptr != '\0') {
-                    ptr++;
-                }
-            } else if (sscanf(ptr, "%d", &koeficjent[i]) == 1) {
-                eksponent[i] = 0;
-                i++;
-                while (*ptr != '-' && *ptr != '+' && *ptr != '\n' && *ptr != '\0') {
+                while (*ptr !=' ' && *ptr != '\n' && *ptr != '\0') {
                     ptr++;
                 }
             }
-            if (*ptr == '+') {
+            if (*ptr == ' ') {
                 ptr++;
-            }
-            if (*ptr == '-') {
-                ptr++;
-                sscanf(ptr, "%dx^%d", &koeficjent[i], &eksponent[i]);
-                koeficjent[i]=-koeficjent[i];
-                i++;
-                while (*ptr != '-' && *ptr != '+' && *ptr != '\n' && *ptr != '\0') {
-                    ptr++;
-                }
             }
         }
         insert_s(&head, koeficjent, eksponent);
+    }
+    for(Polinom *curr=head;curr!=NULL;curr=curr->next){
+       sort(curr);
     }
     for(Polinom *curr=head;curr!=NULL;curr=curr->next){
         for(int i = 0; i < MAX_TERMS; i++) {
@@ -79,5 +118,9 @@ int main(){
         }
         printf("novi\n");
     }
+    printf("nakon\n");
+    //zbrajanje(&head);
+    mnozenje(&head);
+    
     return 0;
 }
